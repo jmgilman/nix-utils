@@ -7,53 +7,55 @@
 in {
   mkTask = {
     name,
-    task,
+    text,
+    category ? "",
+    help ? "",
     runtimeInputs ? [],
   }:
     l.writeShellScriptApp {
-      inherit name runtimeInputs;
-      text = task;
-    };
+      inherit name runtimeInputs text;
+    }
+    // {passthru = {inherit name category help;};};
 
   mkScriptTask = {
+    name,
     path,
+    category ? "",
+    help ? "",
     runtimeInputs ? [],
     runtimeShell ? nixpkgs.runtimeShell,
-  }: let
-    name = l.elemAt (l.splitString "." (l.baseNameOf path)) 0;
-  in
-    nixpkgs.runCommand name
-    {
-      inherit path;
-      meta.mainProgram = name;
-    }
-    ''
-      mkdir -p $out/bin
-      script="$out/bin/${name}"
+  }:
+    (nixpkgs.runCommand name
+      {
+        inherit path;
+        meta.mainProgram = name;
+      }
+      ''
+        mkdir -p $out/bin
+        script="$out/bin/${name}"
 
-      # Create initial script with correct shebang and inputs
-      echo '#!${runtimeShell}' >$script
-      echo 'export PATH="${l.makeBinPath runtimeInputs}:$PATH"' >>$script
+        # Create initial script with correct shebang and inputs
+        echo '#!${runtimeShell}' >$script
+        echo 'export PATH="${l.makeBinPath runtimeInputs}:$PATH"' >>$script
 
-      # Append the rest of the script with original shebang removed
-      sed 's/^#!.*$//' $path | tail -n +2 >>$script
-      chmod +x $script
+        # Append the rest of the script with original shebang removed
+        sed 's/^#!.*$//' $path | tail -n +2 >>$script
+        chmod +x $script
 
-      # Validate final result
-      ${nixpkgs.stdenv.shellDryRun} $script
-      ${nixpkgs.shellcheck}/bin/shellcheck $script
-    '';
+        # Validate final result
+        ${nixpkgs.stdenv.shellDryRun} $script
+        ${nixpkgs.shellcheck}/bin/shellcheck $script
+      '')
+    // {passthru = {inherit name category help;};};
 
   mkTaskCommand = {
-    name,
-    category,
-    help,
+    task,
     cell ? "automation",
     cellBlock ? "tasks",
   }: {
-    inherit name help category;
+    inherit (task.passthru) name help category;
     command = ''
-      nix run .#${nixpkgs.system}.${cell}.${cellBlock}.${name}
+      nix run .#${nixpkgs.system}.${cell}.${cellBlock}.${task.name}
     '';
   };
 }
