@@ -12,6 +12,7 @@
 
       cellBlocks = [
         (std.blockTypes.devshells "devshells")
+        (std.blockTypes.functions "lib")
         (std.blockTypes.functions "profiles")
         (std.blockTypes.nixago "configs")
       ];
@@ -19,5 +20,6 @@
     {
       devshell = std.harvest inputs.self ["devshell"];
       devShells = std.harvest inputs.self ["automation" "devshells"];
+      tasks = std.harvest inputs.self ["tasks"];
     };
 }
