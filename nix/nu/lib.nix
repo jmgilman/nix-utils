@@ -42,6 +42,16 @@ in {
         cat $script >>$file
       fi
 
+      # Run sanity check
+      cp $file tmp.nu
+      set +e
+      if ! ${nushell}/bin/nu -c "if nu-check tmp.nu { exit 0 } else { exit 1 }"; then
+        ${nushell}/bin/nu tmp.nu
+        echo "The nushell script contains syntax errors. Please validate and try again."
+        exit 1
+      fi
+      set -e
+
       chmod +x $file
     '';
 }
