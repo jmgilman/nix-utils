@@ -13,5 +13,6 @@ in
         (profiles.core {})
         (profiles.format {})
       ];
+      packages = [nixpkgs.nushell];
     };
   }

@@ -20,6 +20,7 @@
     {
       devshell = std.harvest inputs.self ["devshell"];
       devShells = std.harvest inputs.self ["automation" "devshells"];
+      nu = std.harvest inputs.self ["nu"];
       tasks = std.harvest inputs.self ["tasks"];
     };
 }
