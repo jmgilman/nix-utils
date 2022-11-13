@@ -21,7 +21,7 @@ in {
   }: {
     inherit (task.passthru) name help category;
     command = ''
-      nix run .#${nixpkgs.system}.${cell}.${cellBlock}.${task.name}
+      nix run .#${nixpkgs.system}.${cell}.${cellBlock}.${task.name} -- $@
     '';
   };
 }
