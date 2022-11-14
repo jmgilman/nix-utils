@@ -5,16 +5,37 @@
   inherit (inputs) nixpkgs std;
   l = nixpkgs.lib // builtins;
 in {
+  writeNuInclude = {
+    name,
+    script,
+  }:
+    nixpkgs.runCommand name
+    {
+      inherit script;
+    }
+    ''
+      # Check if we were given a path or a string
+      if [[ ! -f "''${script}" ]]; then
+        echo -n "''${script}" >$out
+      else
+        cp $script $out
+      fi
+    '';
   writeNuScript = {
     name,
     script,
+    includes ? [],
     runtimeInputs ? [],
-    nushell ? nixpkgs.nushell,
+    nushell ? cell.packages.nushell,
   }: let
     mkBinPath = path: ''
       let-env PATH = ($env.PATH | prepend ${path}/bin)
     '';
+    mkInclude = path: ''
+      source ${path}
+    '';
     paths = l.concatStringsSep "\n" (l.map (p: mkBinPath p) runtimeInputs);
+    includes' = l.concatStringsSep "\n" (l.map (p: mkInclude p) includes);
   in
     nixpkgs.runCommand name
     {
@@ -33,6 +54,7 @@ in {
 
       # Create initial script with correct shebang and inputs
       echo '#!${nushell}/bin/nu' >$file
+      echo '${includes'}' >>$file
       echo '${paths}' >>$file
 
       # Remove shebang if present

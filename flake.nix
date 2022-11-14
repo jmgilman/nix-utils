@@ -14,6 +14,8 @@
         (std.blockTypes.devshells "devshells")
         (std.blockTypes.functions "lib")
         (std.blockTypes.functions "profiles")
+        (std.blockTypes.installables "includes")
+        (std.blockTypes.installables "packages")
         (std.blockTypes.nixago "configs")
       ];
     }
