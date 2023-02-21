@@ -10,8 +10,8 @@ in
     scopes ? [],
     hooks ? {},
   }: let
-    conform = std.std.nixago.conform {
-      configData = {
+    conform = std.lib.cfg.conform {
+      data = {
         commit = {
           header = {length = 89;};
           conventional = {
@@ -34,8 +34,8 @@ in
         };
       };
     };
-    lefthook = std.std.nixago.lefthook {
-      configData = {
+    lefthook = std.lib.cfg.lefthook {
+      data = {
         commit-msg = {
           commands = {
             conform = {

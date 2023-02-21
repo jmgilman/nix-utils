@@ -12,7 +12,7 @@ in
     prettier =
       std.lib.dev.mkNixago
       {
-        configData = {
+        data = {
           printWidth = 80;
           proseWrap = "always";
         };
@@ -21,9 +21,9 @@ in
         packages = [nixpkgs.nodePackages.prettier];
       };
     treefmt =
-      std.std.nixago.treefmt
+      std.lib.cfg.treefmt
       {
-        configData = {
+        data = {
           formatter =
             {
               nix = {
